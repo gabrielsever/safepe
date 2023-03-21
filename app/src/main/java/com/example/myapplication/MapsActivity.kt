@@ -2,7 +2,9 @@ package com.example.myapplication
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
+import android.widget.EditText
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -11,17 +13,25 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.myapplication.databinding.ActivityMapsBinding
+import com.google.android.gms.maps.model.Marker
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    private lateinit var pos: LatLng
+    private  var lat: Double = 0.0
+    private  var log: Double = 0.0
+
+    val database = DatabaseManager(this)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
@@ -31,6 +41,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val report_button = findViewById<Button>(R.id.report_button)
         report_button.setOnClickListener {
             // Implementar a lógica para reportar ocorrências
+            lat = pos.latitude
+            log = pos.longitude
+
+            database.insereReport(lat,log, "desc")
 
 
         }
@@ -41,9 +55,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             mMap.clear()
 
             mMap.setOnMapClickListener { latLng ->
-
                 // Adicione o marcador
                 mMap.addMarker(MarkerOptions().position(latLng))
+                pos = latLng
 
                 // Remova o ouvinte para evitar novas marcações
                 mMap.setOnMapClickListener(null)
